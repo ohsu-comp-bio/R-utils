@@ -1,13 +1,14 @@
 gs.wrapper = function(setlist, backgroundset, filename=NULL, gs.range=c(25,2500), ecut=0.05, ocut=5, include.identifiers=FALSE){
+  # function to run basic pathway annotation on an input list of gene sets, using predefined annotation sets.  
+  # please adjust locations of functions and annotation files for your system
+  # backgroundset is a data.frame with fields ID, Entrez.ID and Anno.Symbol  
+  # setlist is a list containing vectors of identifiers in backgroundset ID
+  #  each element is named with the display name for the gene set 
 
   # imports
-  source('/mnt/lustre1/users/burchard/projs/614LC_Set1/analysis/gs.pval.R')
+  source('gs.pval.R')
   tmp=suppressPackageStartupMessages(require(AnnotationDbi))
   tmp=suppressPackageStartupMessages(require(data.table))
-  
-  # backgroundset is a data.frame with fields ID, Entrez.ID and Anno.Symbol  
-  # masklist is a list containing vectors of identifiers in backgroundset ID
-  #  each element is named with the display name for the gene set masked in
 
   # check arguments
   # setlist should be list of nonzero-length vectors
@@ -18,12 +19,12 @@ gs.wrapper = function(setlist, backgroundset, filename=NULL, gs.range=c(25,2500)
   # load annotations
   # need to set up DB to enable non-hardcoded method!
   # annotations with EntrezGeneIDs
-  load("/mnt/lustre1/CompBio/lib/R/data/hsa.kegg.gs.RData"); kegg=hsa.kegg.gs
+  load("hsa.kegg.gs.RData"); kegg=hsa.kegg.gs
   kegg = lapply(hsa.kegg.gs,function(x) as.numeric(x))
-  load("/mnt/lustre1/CompBio/lib/R/data/msigdb.v5.0.entrez.gmt.RData")
+  load("msigdb.v5.0.entrez.gmt.RData")
   msigdb5 = lapply(msigdb5,function(x) as.numeric(x))
   # all 3 GOs in one list; genes as UniProt IDs in pipe-delimited field 
-  load("/mnt/lustre1/CompBio/lib/R/data/GO.gmt.RData")
+  load("GO.gmt.RData")
   # pull out individual GOs and translate their UniProt accessions to EntrezIDs
   GOBP= lapply(GO_gmt[[1]],function(x){
       as.numeric(intraIDMapper(sub('^[^|]+\\|([^|]+)\\|.*$','\\1',x), species="HOMSA", srcIDType="UNIPROT", destIDType="EG", keepMultGeneMatches=FALSE)) }
@@ -36,10 +37,10 @@ gs.wrapper = function(setlist, backgroundset, filename=NULL, gs.range=c(25,2500)
   )
   rm(GO_gmt)
   # annotations with geneSymbols; not a robust identifier type
-  load("/mnt/lustre1/CompBio/lib/R/data/pathwayCommons.gmt.RData")
-  load("/mnt/lustre1/CompBio/lib/R/data/NCI-Nature_Curated.gmt.RData");nci=nci_gmt; rm(nci_gmt)
-  load("/mnt/lustre1/CompBio/lib/R/data/BioCarta.gmt.RData");BioCarta=BioCarta_gmt;rm(BioCarta_gmt)
-  load("/mnt/lustre1/CompBio/lib/R/data/Reactome.gmt.RData");Reactome=Reactome_gmt;rm(Reactome_gmt)
+  load("pathwayCommons.gmt.RData")
+  load("NCI-Nature_Curated.gmt.RData");nci=nci_gmt; rm(nci_gmt)
+  load("BioCarta.gmt.RData");BioCarta=BioCarta_gmt;rm(BioCarta_gmt)
+  load("Reactome.gmt.RData");Reactome=Reactome_gmt;rm(Reactome_gmt)
   annolist = c('kegg','msigdb5','GOBP','GOMF','GOCC','pC','nci','BioCarta','Reactome')
   idtypes = paste('ids',c(rep('ncbi',5),rep('gene',4)),sep='.')
   use.gsr = c(F,T,T,T,T,T,F,F,F)
