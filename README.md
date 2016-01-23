@@ -10,6 +10,8 @@ Files and functions:
   * GMT_from_GOowl()
 * gs.pval.R
   * gs.pval()
+* gs.wrapper.R
+  * # usage example for gs.pval.R
 * lm.pval.R
   * lm.pval()
 
