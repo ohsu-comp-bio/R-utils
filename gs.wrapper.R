@@ -5,6 +5,7 @@ gs.wrapper = function(setlist, backgroundset,
   # function to run basic pathway annotation on an input list of gene sets, using predefined annotation sets.  
   # please adjust locations of functions and annotation files for your system
   # backgroundset is a data.frame with fields ID, Entrez.ID and Anno.Symbol  
+  # Entrez.ID must be HUMAN IDs
   # setlist is a list containing vectors of identifiers in backgroundset ID
   #  each element is named with the display name for the gene set 
   
@@ -68,10 +69,9 @@ gs.wrapper = function(setlist, backgroundset,
   
   # annotate up- and down-regulated selected genes in files
   # expand this to include universe size, sig size and collapsed identifiers if requested
+  out.dt = data.table(rn="",E.Value="",P.Value="",Set.Size="",Overlap="",Sig.Size="",Uni.Size="",Uni.Size.Intersect.Data="",Source="",Condx="")
   if(include.identifiers){
-    out.dt = data.table(rn="",E.Value="",P.Value="",Set.Size="",Overlap="",Sig.Size="",Uni.Size="",Source="",Condx="",ID.list="",alt.ID.list="")
-  } else {
-    out.dt = data.table(rn="",E.Value="",P.Value="",Set.Size="",Overlap="",Sig.Size="",Uni.Size="",Source="",Condx="")
+    out.dt = cbind(out.dt,ID.list="",alt.ID.list="")
   }
   out.dt = out.dt[0,]
   # loop over anno sources 
@@ -110,6 +110,7 @@ gs.wrapper = function(setlist, backgroundset,
         out.dt = rbindlist(list(out.dt,data.table(GS,keep.rownames=T)[GS[,"E.Value"]<ecut & GS[,"Overlap"]>=ocut,]),fill=T)
         out.dt[(nrow(out.dt)-sig.n+1):(nrow(out.dt)),"Sig.Size"] = attr(GS,"Sig.Size")
         out.dt[(nrow(out.dt)-sig.n+1):(nrow(out.dt)),"Uni.Size"] = attr(GS,"Uni.Size")
+        out.dt[(nrow(out.dt)-sig.n+1):(nrow(out.dt)),"Uni.Size.Intersect.Data"] = uni.size.int
         out.dt[(nrow(out.dt)-sig.n+1):(nrow(out.dt)),"Source"] = src
         out.dt[(nrow(out.dt)-sig.n+1):(nrow(out.dt)),"Condx"] = signame
         if(include.identifiers){
