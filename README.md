@@ -12,6 +12,8 @@ Files and functions:
   * gs.pval()
 * gs.wrapper.R
   * # usage example for gs.pval.R
+* gs.wrapper.annotation.columns.csv
+  * # column descriptions for output file of gs.wrapper
 * lm.pval.R
   * lm.pval()
 
