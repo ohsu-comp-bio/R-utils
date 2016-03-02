@@ -1,4 +1,6 @@
 # R-utils
+# Created by Julja Burchard and Jessica Minnier
+# 2015/2016
 R utilities for omic analyses
 
 This is a mutt collection of R functions useful for analysis of 'omic data.
