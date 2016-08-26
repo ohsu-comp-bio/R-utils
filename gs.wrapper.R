@@ -8,6 +8,7 @@ gs.wrapper = function(setlist, backgroundset,
   # Entrez.ID must be HUMAN IDs
   # setlist is a list containing vectors of identifiers in backgroundset ID
   #  each element is named with the display name for the gene set 
+  # Note that setlist MUST contain a names() attribute.
   
   if(is.null(functiondir)) functiondir=getwd()
   if(is.null(resourcedir)) resourcedir=getwd()
