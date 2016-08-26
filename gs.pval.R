@@ -62,7 +62,8 @@ gs.pval = function(gs, rnames, is.sig, uni.size, min.size=0, max.size=Inf, inclu
   sig.cmat = cmat & is.sig
   ovlp.sizes = colSums(sig.cmat)
   gs.sizes = colSums(cmat)
-  gs.ps = phyper(ovlp.sizes,gs.sizes,uni.size,nr.sigs,lower.tail=FALSE)
+  # R uses: successes in sample, successes in population, _non_successes in population, sample size
+  gs.ps = phyper(ovlp.sizes,gs.sizes,uni.size-gs.sizes,nr.sigs,lower.tail=FALSE)
   gs.ps[ovlp.sizes==0] = 1 #phyper says finding 0 of 0-3 is p<0.05?!
   # generate return structure
   gs.idx = sort.list(gs.ps)
