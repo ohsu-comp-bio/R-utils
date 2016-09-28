@@ -93,11 +93,11 @@ GMT_from_BioPax = function(biopaxstring){
 }
 
 
-GMT_from_GOowl = function(GOowlstring,GOannostring){
+GMT_from_GOowl = function(GOowlstring,GOannostring,trim_regex=NULL){
   # TODO: add alternate reading, and argument protection
-  # TODO: switch to event-driven code for efficiency!!
-  # reads in GO ontology in XML format and as parsed in GO.db
-  #  and reads in gene mappings from GAF2 file
+  # reads in GO ontology in GOowl format and as parsed in GO.db
+  #  and reads in species-specific gene mappings from GOanno file
+  # optionally trims gene identifiers using trim_regex
   # returns list of GMT-format lists @ for GO BP, MF and CC
   require("XML")
   require("data.table")
@@ -111,9 +111,12 @@ GMT_from_GOowl = function(GOowlstring,GOannostring){
   GOtab = data.table(rowcount=1:length(tmp),id="",label="",hasOBONamespace="", subClassOf="",key="rowcount")
   for(i in 1:length(tmp)){
     tmp2 = xmlApply(tmp[[i]],xmlValue)
-    GOtab[i,c("id","label","hasOBONamespace")] = tmp2[c("id","label","hasOBONamespace")]
-    GOtab[i,'subClassOf'] = paste(sub('^.*\\/(GO_[0-9]+).*$','\\1',xmlElementsByTagName(tmp[[i]],'subClassOf')),sep='',collapse=';')
     GOtab[i,'deprecated'] = length(xmlElementsByTagName(tmp[[i]],'deprecated'))>0
+    # parse rest if not deprecated (data may not be available)
+    if( !GOtab[i,get('deprecated')] ){
+      GOtab[i,c("id","label","hasOBONamespace")] = tmp2[c("id","label","hasOBONamespace")]
+      GOtab[i,'subClassOf'] = paste(sub('^.*\\/(GO_[0-9]+).*$','\\1',xmlElementsByTagName(tmp[[i]],'subClassOf')),sep='',collapse=';')
+    }
   }
   GOtab = subset(GOtab,subset=deprecated==F,select=c("id","label","hasOBONamespace","subClassOf"))
   rm(tmp,tmp2)
@@ -127,6 +130,7 @@ GMT_from_GOowl = function(GOowlstring,GOannostring){
   GOtype = unique(GOtab$hasOBONamespace)
   names(GOtype) = toupper(sub('^[^_]+_(.).*$','\\1',GOtype))#matches GOtab
   GO_gmt = vector(mode="list",length=length(GOtype))
+  names(GO_gmt) = paste("GO",GOtags,sep='')
   for(j in 1:length(GOtype)){
     GOdown = as.list(get(paste("GO",GOtags[names(GOtype)[j]],"OFFSPRING",sep='')))
     tmp2 = GOtab[hasOBONamespace==GOtype[j]]
@@ -144,6 +148,11 @@ GMT_from_GOowl = function(GOowlstring,GOannostring){
       GO_gmt[[j]][i] = lfun( unique(tmp3$V2[tmp3$V3 %in% GOset]) )
     }
     names(GO_gmt[[j]]) = GOj
+  }
+  if( !is.null(trim_regex) ){
+    for(j in 1:length(GOtype)){
+      GO_gmt[[j]] = lapply(GO_gmt[[j]],function(x){sub(trim_regex,'\\1',x)})
+    }
   }
   return(GO_gmt)
 }
