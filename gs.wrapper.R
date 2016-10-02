@@ -79,11 +79,16 @@ gs.wrapper = function(setlist, backgroundset, include.identifiers=FALSE,
     )
   } else { #non-default load
     uni = NULL
-    for( i in length(resourceset) ){
+    for( i in 1:length(resourceset) ){
       resourcename = sub('.RData','',resourceset[i])
+      message("loading ",file.path(resourcedir,resourceset[i]))
+      stopifnot( file.exists(file.path(resourcedir,resourceset[i])) )
       load(file.path(resourcedir,resourceset[i]))
       uni[[ paste("uni",resourcename,sep='.') ]] = 
              unique(unlist(get(resourcename)))
+    }
+    for( src in annolist ){
+      message(src," : ",length(uni[[paste('uni',src,sep='.')]]))
     }
   }  
   # annotate up- and down-regulated selected genes in files
@@ -105,7 +110,7 @@ gs.wrapper = function(setlist, backgroundset, include.identifiers=FALSE,
     if( idtypes[a]=="Anno.Symbol" ){ alt.idtype = "Entrez.ID" }
     # universe size to use
     if( anno.uni ){
-      uni.size=length(unique(uni[[paste('uni',src,sep='.')]]))
+      uni.size=length(uni[[paste('uni',src,sep='.')]])
     } else { uni.size = NULL }
     # annotate each set
     for( i in 1:length(setlist) ){
