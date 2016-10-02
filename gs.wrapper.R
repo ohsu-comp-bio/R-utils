@@ -88,7 +88,7 @@ gs.wrapper = function(setlist, backgroundset, include.identifiers=FALSE,
              unique(unlist(get(resourcename)))
     }
     for( src in annolist ){
-      message(src," : ",length(uni[[paste('uni',src,sep='.')]]))
+      message(src," universe size: ",length(uni[[paste('uni',src,sep='.')]]))
     }
   }  
   # annotate up- and down-regulated selected genes in files
