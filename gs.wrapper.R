@@ -59,16 +59,15 @@ gs.wrapper = function(setlist, backgroundset, include.identifiers=FALSE,
     kegg = lapply(hsa.kegg.gs,function(x) as.numeric(x))
     load(file.path(resourcedir,"msigdb.v5.0.entrez.gmt.RData"))
     msigdb5 = lapply(msigdb5,function(x) as.numeric(x))
-    load(paste0(resourcedir,"GO_processed.gmt.RData"))
+    load(file.path(resourcedir,"GO_processed.gmt.RData"))
     # annotations with geneSymbols; not a robust identifier type
-    load(file.path(resourcedir,"pathwayCommons.gmt.RData"))
+    load(file.path(resourcedir,"pathwayCommons.gmt.RData"));
     load(file.path(resourcedir,"NCI-Nature_Curated.gmt.RData"));nci=nci_gmt; rm(nci_gmt)
     load(file.path(resourcedir,"BioCarta.gmt.RData"));BioCarta=BioCarta_gmt;rm(BioCarta_gmt)
     load(file.path(resourcedir,"Reactome.gmt.RData"));Reactome=Reactome_gmt;rm(Reactome_gmt)
     # define universes for each gene set source
     uni = list(uni.kegg = unique(unlist(kegg,F,F)),
       uni.pC = unique(unlist(pC,F,F)),
-      uni.pC = toupper(uni.pC),
       uni.msigdb5 = unique(unlist(msigdb5,F,F)),
       uni.GOBP = unique(unlist(GOBP,F,F)),
       uni.GOMF = unique(unlist(GOMF,F,F)),
